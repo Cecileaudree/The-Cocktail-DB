@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ApiResponse, Character } from "../types/api.type";
 
 const apiClient = axios.create({
   baseURL: "https://rickandmortyapi.com/api/",
@@ -25,4 +26,18 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export const getCharacters = async (page: number) => {
+  const response = await apiClient.get<ApiResponse<Character>>(
+    `character?page=${page}`
+  );
+  return response.data;
+};
+
+// 🔹 récupérer un personnage par ID
+export const getItemById = async (id: number): Promise<Character> => {
+  const response = await apiClient.get<Character>(`character/${id}`);
+  return response.data;
+};
+
 export default apiClient;

@@ -17,7 +17,7 @@ export interface ApiInfo {
   count: number;
   pages: number;
   next: string | null;
-  prev: string | null;
+  prev: null | null;
 }
 
 export interface ApiResponse<T> {
