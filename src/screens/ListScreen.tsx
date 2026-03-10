@@ -3,54 +3,22 @@ import {
   View,
   Text,
   FlatList,
-  Image,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
-import axios from 'axios';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../components/SearchBar';
+import CharacterCard from '../components/CharacterCard';
 import { RootStackParamList } from '../../App';
+import { getCharacters } from '../services/rickmorty.service';
+import { Character } from '../services/api.type';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Character {
-  id: number;
-  name: string;
-  status: 'Alive' | 'Dead' | 'unknown';
-  species: string;
-  gender: string;
-  image: string;
-  location: { name: string };
-}
-
-interface ApiInfo {
-  count: number;
-  pages: number;
-  next: string | null;
-  prev: string | null;
-}
-
-interface ApiResponse {
-  info: ApiInfo;
-  results: Character[];
-}
+// ─── Type de navigation ─────────────────────────────────────────────────────
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
-// ─── Constantes ──────────────────────────────────────────────────────────────
-
-const BASE_URL = 'https://rickandmortyapi.com/api';
-
-// Couleurs selon le statut du personnage
-const STATUS_COLORS: Record<string, string> = {
-  Alive: '#2ecc71',
-  Dead: '#e74c3c',
-  unknown: '#95a5a6',
-};
 
 // ─── Composant ListScreen ────────────────────────────────────────────────────
 
@@ -69,23 +37,14 @@ const ListScreen: React.FC = () => {
 
   // Recherche
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchMode, setIsSearchMode] = useState(false);
 
   // ── Fetch par page ────────────────────────────────────────────────────────
   const fetchCharacters = useCallback(
     async (pageNum: number, query: string, append: boolean) => {
       try {
-        const params: Record<string, string | number> = { page: pageNum };
-        if (query.trim()) params.name = query.trim();
-
-        const response = await axios.get<ApiResponse>(
-          `${BASE_URL}/character`,
-          { params }
-        );
-
-        const { results, info } = response.data;
-        setCharacters((prev) => (append ? [...prev, ...results] : results));
-        setHasMore(info.next !== null);
+        const data = await getCharacters(pageNum, query);
+        setCharacters((prev) => (append ? [...prev, ...data.results] : data.results));
+        setHasMore(data.info.next !== null);
         setError(null);
       } catch (err: any) {
         // L'API renvoie 404 si aucun personnage trouvé
@@ -118,11 +77,6 @@ const ListScreen: React.FC = () => {
       setPage(1);
       setHasMore(true);
       setIsLoading(true);
-      if (query.trim() === '') {
-        setIsSearchMode(false);
-      } else {
-        setIsSearchMode(true);
-      }
       await fetchCharacters(1, query, false);
       setIsLoading(false);
     },
@@ -149,34 +103,13 @@ const ListScreen: React.FC = () => {
     setIsRefreshing(false);
   }, [searchQuery, fetchCharacters]);
 
-  // ── Rendu d'une carte personnage ──────────────────────────────────────────
+  // ── Rendu d'une carte via le composant CharacterCard ─────────────────────
   const renderItem = ({ item }: { item: Character }) => (
     <TouchableOpacity
-      style={styles.card}
       onPress={() => navigation.navigate('Detail', { id: String(item.id) })}
       activeOpacity={0.8}
     >
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <View style={styles.cardBody}>
-        <Text style={styles.cardTitle} numberOfLines={1}>
-          {item.name}
-        </Text>
-        <Text style={styles.cardSub}>
-          {item.species} · {item.gender}
-        </Text>
-        <Text style={styles.cardLocation} numberOfLines={1}>
-          📍 {item.location.name}
-        </Text>
-        <View style={styles.statusRow}>
-          <View
-            style={[
-              styles.statusDot,
-              { backgroundColor: STATUS_COLORS[item.status] ?? '#95a5a6' },
-            ]}
-          />
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-      </View>
+      <CharacterCard character={item} />
     </TouchableOpacity>
   );
 
@@ -262,59 +195,6 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 16,
     paddingBottom: 20,
-  },
-  // Carte personnage
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a2e',
-    borderRadius: 14,
-    marginVertical: 8,
-    shadowColor: '#00b5cc',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-    overflow: 'hidden',
-  },
-  cardImage: {
-    width: 100,
-    height: 100,
-  },
-  cardBody: {
-    flex: 1,
-    padding: 12,
-    justifyContent: 'center',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 4,
-  },
-  cardSub: {
-    fontSize: 13,
-    color: '#aaa',
-    marginBottom: 4,
-  },
-  cardLocation: {
-    fontSize: 12,
-    color: '#888',
-    marginBottom: 6,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    marginRight: 6,
-  },
-  statusText: {
-    fontSize: 12,
-    color: '#ccc',
-    fontWeight: '600',
   },
   // États
   centered: {
