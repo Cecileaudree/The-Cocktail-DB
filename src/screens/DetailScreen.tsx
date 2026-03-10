@@ -5,6 +5,7 @@ import { RouteProp } from "@react-navigation/native";
 import { Character } from "../types/api.type";
 import { RootStackParamList } from "../types/navigation";
 import { getItemById } from "../services/api.service";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type DetailRouteProp = RouteProp<RootStackParamList, "Detail">;
 
@@ -51,6 +52,7 @@ export default function DetailScreen({ route }: Props) {
   }
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={styles.container}>
 
       <Image source={{ uri: character.image }} style={styles.image} />
@@ -88,6 +90,7 @@ export default function DetailScreen({ route }: Props) {
       </View>
 
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

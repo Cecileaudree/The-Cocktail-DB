@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import ListScreen from './src/screens/ListScreen';
 import DetailScreen from './src/screens/DetailScreen';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // ─── Types de navigation ───────────────────
 export type RootStackParamList = {
@@ -15,6 +16,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
+    <SafeAreaProvider >
     <NavigationContainer>
       <StatusBar style="dark" />
       <Stack.Navigator
@@ -37,5 +39,6 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

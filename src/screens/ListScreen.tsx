@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../components/SearchBar';
@@ -17,11 +18,9 @@ import { getCharacters } from '../services/rickmorty.service';
 import { Character } from '../types/api.type';
 
 // ─── Type de navigation ─────────────────────────────────────────────────────
-
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
-// ─── Composant ListScreen ────────────────────────────────────────────────────
-
+// ─── Composant ListScreen ───────────────────────────────────────────────────
 const ListScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
 
@@ -128,28 +127,28 @@ const ListScreen: React.FC = () => {
   // ── Écran d'erreur avec bouton Réessayer ──────────────────────────────────
   if (error && characters.length === 0) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
           <Text style={styles.retryText}>🔄 Réessayer</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
   // ── Écran de chargement initial ───────────────────────────────────────────
   if (isLoading && characters.length === 0) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color="#00b5cc" />
         <Text style={styles.loadingText}>Chargement des personnages...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   // ── Rendu principal ───────────────────────────────────────────────────────
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <SearchBar
         onSearch={handleSearch}
         placeholder="Rechercher un personnage..."
@@ -181,12 +180,11 @@ const ListScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
