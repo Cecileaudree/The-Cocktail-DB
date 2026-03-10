@@ -14,7 +14,7 @@ import SearchBar from '../components/SearchBar';
 import CharacterCard from '../components/CharacterCard';
 import { RootStackParamList } from '../../App';
 import { getCharacters } from '../services/rickmorty.service';
-import { Character } from '../services/api.type';
+import { Character } from '../types/api.type';
 
 // ─── Type de navigation ─────────────────────────────────────────────────────
 

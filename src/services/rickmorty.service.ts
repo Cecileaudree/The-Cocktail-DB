@@ -1,5 +1,5 @@
 import apiClient from './api.service';
-import { ApiResponse, Character } from './api.type';
+import { ApiResponse, Character } from '../types/api.type';
 
 // Récupère une page de personnages avec recherche optionnelle
 export const getCharacters = async (
