@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import ListScreen from './src/screens/ListScreen';
 import DetailScreen from './src/screens/DetailScreen';
 
-// ─── Types de navigation ──────────────────────────────────────────────────────
+// ─── Types de navigation ───────────────────
 export type RootStackParamList = {
   Home: undefined;
   Detail: { id: string };

@@ -1,34 +1,130 @@
-import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../App';
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { RouteProp } from "@react-navigation/native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Detail'>;
+import { Character } from "../types/api.type";
+import { RootStackParamList } from "../types/navigation";
+import { getItemById } from "../services/api.service";
 
-// Ce composant sera complété par l'Étudiant B
-const DetailScreen: React.FC<Props> = ({ route }) => {
-  const { id } = route.params;
+type DetailRouteProp = RouteProp<RootStackParamList, "Detail">;
 
-  return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color="#00b5cc" />
-      <Text style={styles.text}>Chargement du personnage #{id}…</Text>
-    </View>
-  );
+type Props = {
+  route: DetailRouteProp;
 };
 
+export default function DetailScreen({ route }: Props) {
+
+  const { id } = route.params;
+
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCharacter = async () => {
+    try {
+      const data = await getItemById(id);
+      setCharacter(data);
+    } catch (error) {
+      console.log("Erreur API :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCharacter();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!character) {
+    return (
+      <View style={styles.center}>
+        <Text>Personnage introuvable</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+
+      <Image source={{ uri: character.image }} style={styles.image} />
+
+      <Text style={styles.name}>{character.name}</Text>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Status :</Text>
+        <Text>{character.status}</Text>
+      </View>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Species :</Text>
+        <Text>{character.species}</Text>
+      </View>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Gender :</Text>
+        <Text>{character.gender}</Text>
+      </View>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Origin :</Text>
+        <Text>{character.origin.name}</Text>
+      </View>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Location :</Text>
+        <Text>{character.location.name}</Text>
+      </View>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Episodes :</Text>
+        <Text>{character.episode.length}</Text>
+      </View>
+
+    </ScrollView>
+  );
+}
+
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0a0a1a',
+    padding: 20
   },
-  text: {
-    marginTop: 12,
-    fontSize: 15,
-    color: '#aaa',
-  },
-});
 
-export default DetailScreen;
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+
+  image: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10
+  },
+
+  name: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginTop: 15,
+    marginBottom: 10
+  },
+
+  infoBox: {
+    flexDirection: "row",
+    marginBottom: 8
+  },
+
+  label: {
+    fontWeight: "bold",
+    marginRight: 5
+  }
+
+});
