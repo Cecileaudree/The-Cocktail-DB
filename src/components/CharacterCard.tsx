@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Character } from '../services/api.type';
+import { Character } from '../types/api.type';
 
 interface CharacterCardProps {
   character: Character;
